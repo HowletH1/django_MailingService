@@ -1,0 +1,29 @@
+{% extends 'service/base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-4">
+                <a href='{% url 'service:mailing_create' %}' class="btn btn-primary btn-block">Добавить рассылку</a>
+            </div>
+        </div>
+    </div>
+    {% for mailing in object_list %}
+        <div class="col-md-12">
+            <div class="card m-2 box-shadow text-primary">
+                <div class="card-body">
+                    <h4>{{ mailing }}</h4>
+                    <h5><p class="card-text text-info">{{ mailing.message }}</p></h5>
+                       статус активности  <p  class="card-text text-info">{{ mailing.is_active }}</p>
+                       статус выполнения  <p class="card-text text-info">{{ mailing.status }}</p>
+{#                    <h5> Клиенты </h5>#}
+                    {% for client in mailing.clients.all %}
+                        <h6><p class="card-text text-info">{{ client }}</p></h6>
+                    {% endfor %}
+                    <a href="{% url 'service:mailing_update' mailing.id %}">Редактировать</a>
+                    <a href="{% url 'service:mailing_delete' mailing.id %}">Удалить</a><br>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}

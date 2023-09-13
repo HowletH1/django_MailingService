@@ -1,0 +1,34 @@
+{% extends 'service/base.html' %}
+{% block content %}
+
+    <h4><p class="text text-primary"> Всего рассылок: {{ mailings_total }}</h4>
+    <h4><p class="text text-success"> Активных рассылок: {{ mailings_active }}</h4>
+    {% if unique_clients %}
+        <h4><p class="text text-primary"> Уникальные клиенты: {{ unique_clients }}</h4>
+    {% else %}
+        <h4><p class="text text-secondary"> Уникальные клиенты отсутствуют</h4> {% endif %}
+
+    {% for post in posts %}
+        <div class="col-md-12">
+            <div class="card mb-4 box-shadow text-primary m-2">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h4>{{ post }}</h4>
+                    </div>
+                    <p class="card-text m-1">
+                    <h5><p class="card-text text-info">{{ post.content|truncatewords:10 }}</p></h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                            <a href='{% url 'service:post' post.created.year post.created.month post.created.day post.slug %}'
+                               class="btn btn-outline-primary">Перейти к статье</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
+
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'service/base.html' %}
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+            <div class="col-10">
+
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_div }}
+                    <button type="submit" class="btn btn-primary"> {% if object %}Изменить{% else %}
+                        Создать{% endif %}</button>
+                </form>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

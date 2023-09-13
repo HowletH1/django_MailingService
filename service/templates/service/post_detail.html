@@ -1,0 +1,23 @@
+{% extends 'service/base.html' %}
+{#{% load custom_tags %}#}
+{% block content %}
+    <div class="album py-5 bg-light bg-transparent">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7">
+                    <div class="card mb-4 box-shadow">
+                        <div class="card-body">
+                            <h4><p class="card-title text-primary"> {{ object.title }}</h4>
+                            <p class="card-text">{{ object.content }}</p>
+                            <p class="card-footer text-info">Дата создания: {{ object.created }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <img class="card-img-top" src='{{  object.preview.url }}' alt="Card image cap">
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

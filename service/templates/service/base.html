@@ -1,0 +1,56 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<div class="container text-primary">
+    <div class="row">
+        <div class="col offset-2 d-flex justify-content-center text-info">
+            <h2>{{ title }}</h2>
+        </div>
+    </div>
+    <br>
+    <div class="container">
+        <div class="row">
+            <div class="col-2">
+                <ul class="nav flex-column h5">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'service:clients' %}">Клиенты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " href="{% url 'service:mailing_list' %}">Рассылки</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'service:messages' %}">Сообщения</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'service:blog' %}">Блог</a>
+                    </li>
+                    <li>
+                        <hr style="border: 1px solid green;">
+                    </li>
+                    <li class="nav-item">
+                            {% if user.is_authenticated %}
+                            <span class="badge badge-pill badge-primary">{{ user }}</span>
+                            <a class="nav-link" href="{% url 'users:logout' %}">Выйти</a>
+                            <a class="nav-link" href="{% url 'users:profile' %}">Профиль</a>
+                        {% else %}
+                            <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+            <div class="col-10">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>

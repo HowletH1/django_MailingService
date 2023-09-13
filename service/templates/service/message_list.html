@@ -1,0 +1,23 @@
+{% extends 'service/base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-4">
+                <a href='{% url 'service:messages_create' %}' class="btn btn-primary btn-block">Добавить сообщение</a>
+            </div>
+        </div>
+    </div>
+    {% for message in object_list %}
+        <div class="col-md-12">
+            <div class="card m-2 box-shadow text-primary">
+                <div class="card-body">
+                    <h5>{{ message }}</h5>
+                    <h4><p class="card-text text-info">Сообщение: {{ message.body|truncatewords:50 }}</p></h4>
+                    <a href="{% url 'service:messages_update' message.id %}">Редактировать</a>
+                    <a href="{% url 'service:messages_delete' message.id %}">Удалить</a><br>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
