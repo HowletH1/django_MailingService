@@ -9,6 +9,7 @@ class Client(models.Model):
     email = models.EmailField(verbose_name='Почта')
     comment = models.TextField(verbose_name='Комментарий')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, verbose_name='Владелец', null=True)
+    is_active = models.BooleanField(default=True, verbose_name='Статус клиента')
 
     def __str__(self):
         return f'Клиент: {self.name} - {self.email}'
