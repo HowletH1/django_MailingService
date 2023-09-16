@@ -47,25 +47,26 @@ def start_mailing():
         messages = Message.objects.filter(mailing=mailing.pk)
         emails = [client.email for client in clients]
         mass_messages = []
-        if mailing.status == 'CR':
-            if check_mailing_time():
-                mailing.status = 'LA'
-                mailing.save()
-                for message in messages:
-                    mass_messages.append((message.title, message.body, settings.EMAIL_HOST_USER, emails))
-                print(mass_messages)
-                sendmail(mass_messages, mailing)
-                mailing.status = 'CM'
-                mailing.save()
+        if mailing.is_active:
+            if mailing.status == 'CR':
+                if check_mailing_time():
+                    mailing.status = 'LA'
+                    mailing.save()
+                    for message in messages:
+                        mass_messages.append((message.title, message.body, settings.EMAIL_HOST_USER, emails))
+                    print(mass_messages)
+                    sendmail(mass_messages, mailing)
+                    mailing.status = 'CM'
+                    mailing.save()
 
-        elif mailing.status == 'CM':
-            match mailing.frequency:
-                case 'DA':
-                    mailing.date += datetime.timedelta(days=1)
-                case 'WE':
-                    mailing.date += datetime.timedelta(days=7)
-                case 'MO':
-                    mailing.date += datetime.timedelta(days=30)
-            mailing.status = 'CR'
-            mailing.save()
+            elif mailing.status == 'CM':
+                match mailing.frequency:
+                    case 'DA':
+                        mailing.date += datetime.timedelta(days=1)
+                    case 'WE':
+                        mailing.date += datetime.timedelta(days=7)
+                    case 'MO':
+                        mailing.date += datetime.timedelta(days=30)
+                mailing.status = 'CR'
+                mailing.save()
 
