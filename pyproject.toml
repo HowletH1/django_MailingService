@@ -10,19 +10,10 @@ packages = [{include = "django_mailingservice"}]
 python = "^3.11"
 django = "^4.2.5"
 django-crontab = "^0.7.1"
-flake8 = "^6.1.0"
 psycopg2-binary = "^2.9.7"
 python-dotenv = "^1.0.0"
 pillow = "^10.0.0"
-redis = "^5.0.0"
-sqlparse = "^0.4.4"
-typing-extensions = "^4.7.1"
-django-timedeltafield = "^0.7.10"
-django-cron = "^0.6.0"
 django-apscheduler = "^0.6.2"
-python-dateutil = "^2.8.2"
-schedule = "^1.2.0"
-crontab = "^1.0.1"
 
 
 [build-system]

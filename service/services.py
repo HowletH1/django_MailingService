@@ -4,7 +4,6 @@ from django.core.mail import send_mass_mail
 from django_MailingService import settings
 from service.models import Mailing, MailingLogs, Blog, Message, Client
 import datetime
-import schedule
 
 
 def get_posts_cached(n: int):
