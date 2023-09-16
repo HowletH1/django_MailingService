@@ -7,6 +7,27 @@ from service.models import Client, Message, Blog, MailingLogs, Mailing
 from service.services import get_posts_cached
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth import mixins
+from django.http import Http404
+
+
+class EditCheckMixin:
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.user != self.request.user and not self.request.user.is_superuser:
+            raise Http404('Изменять может только владелец')
+        return self.object
+
+
+class SetUserMixin:
+    def form_valid(self, form):
+        self.object = form.save()
+        self.object.user = self.request.user
+        self.object.save()
+        return super().form_valid(form)
+
+
+class PermissionAndLoginRequiredMixin(PermissionRequiredMixin, LoginRequiredMixin):
+    model = models.Mailing
 
 
 class MainView(generic.TemplateView):
@@ -25,8 +46,8 @@ class MainView(generic.TemplateView):
         return context
 
 
-class ClientCreateView(PermissionRequiredMixin, generic.CreateView):
-    permission_required = 'service.create_client'
+class ClientCreateView(SetUserMixin, generic.CreateView):
+    # permission_required = 'service.create_client'
     model = Client
     form_class = ClientForm
     success_url = reverse_lazy('service:clients')
@@ -42,8 +63,8 @@ class ClientsView(generic.ListView):
     }
 
 
-class ClientDeleteView(PermissionRequiredMixin, generic.DeleteView):
-    permission_required = 'service.delete_client'
+class ClientDeleteView(EditCheckMixin, generic.DeleteView):
+    # permission_required = 'service.delete_client'
     model = Client
     success_url = reverse_lazy('service:clients')
     extra_context = {
@@ -51,8 +72,8 @@ class ClientDeleteView(PermissionRequiredMixin, generic.DeleteView):
     }
 
 
-class ClientUpdateView(PermissionRequiredMixin, generic.UpdateView):
-    permission_required = 'service.change_client'
+class ClientUpdateView(EditCheckMixin, generic.UpdateView):
+    # permission_required = 'service.change_client'
     model = Client
     form_class = ClientForm
     success_url = reverse_lazy('service:clients')
@@ -61,7 +82,7 @@ class ClientUpdateView(PermissionRequiredMixin, generic.UpdateView):
     }
 
 
-class MailingCreateView(mixins.PermissionRequiredMixin, generic.CreateView):
+class MailingCreateView(PermissionRequiredMixin, SetUserMixin, generic.CreateView):
     permission_required = 'service.add_mailing'
     model = models.Mailing
     form_class = MailingForm
@@ -79,7 +100,7 @@ class MailingsView(generic.ListView):
     }
 
 
-class MailingDeleteView(mixins.PermissionRequiredMixin, generic.DeleteView):
+class MailingDeleteView(PermissionAndLoginRequiredMixin, EditCheckMixin, generic.DeleteView):
     permission_required = 'service.delete_mailing'
     model = models.Mailing
     success_url = reverse_lazy('service:mailing_list')
@@ -88,7 +109,7 @@ class MailingDeleteView(mixins.PermissionRequiredMixin, generic.DeleteView):
     }
 
 
-class MailingUpdateView(mixins.PermissionRequiredMixin, generic.UpdateView):
+class MailingUpdateView(PermissionAndLoginRequiredMixin, EditCheckMixin, generic.UpdateView):
     permission_required = 'service.change_mailing'
     model = models.Mailing
     form_class = MailingForm
@@ -105,7 +126,7 @@ class MailingAttemptsView(generic.ListView):
     }
 
 
-class MessageCreateView(mixins.PermissionRequiredMixin, generic.CreateView):
+class MessageCreateView(PermissionRequiredMixin, SetUserMixin, generic.CreateView):
     permission_required = 'service.add_message'
     model = Message
     form_class = MessageForm
@@ -122,7 +143,7 @@ class MessagesView(generic.ListView):
     }
 
 
-class MessageDeleteView(mixins.PermissionRequiredMixin, generic.DeleteView):
+class MessageDeleteView(PermissionRequiredMixin, EditCheckMixin, generic.DeleteView):
     permission_required = 'service.delete_mailing'
     model = Message
     success_url = reverse_lazy('service:messages')
@@ -131,7 +152,7 @@ class MessageDeleteView(mixins.PermissionRequiredMixin, generic.DeleteView):
     }
 
 
-class MessageUpdateView(mixins.PermissionRequiredMixin, generic.UpdateView):
+class MessageUpdateView(PermissionRequiredMixin, EditCheckMixin, generic.UpdateView):
     permission_required = 'service.change_message'
     model = Message
     form_class = MessageForm

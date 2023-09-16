@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "django_cron",
+    "django_apscheduler",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'service.apps.ServiceConfig',
     'users.apps.UsersConfig',
-    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -133,7 +132,7 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
@@ -142,6 +141,13 @@ EMAIL_HOST_PASSWORD = 'agfommgusjplarck'
 # EMAIL_HOST_PASSWORD = 'danila23mailservice'
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+
 
 CACHE_ENABLED = True
+
+APSCHEDULER_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
