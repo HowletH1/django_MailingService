@@ -20,6 +20,9 @@
             <div class="col-2">
                 <ul class="nav flex-column h5">
                 {% if user.is_authenticated%}
+                    <li>
+                        <hr style="border: 1px solid green;">
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'service:clients' %}">Клиенты</a>
                     </li>
@@ -32,10 +35,10 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'service:blog' %}">Блог</a>
                     </li>
+                    {% endif %}
                     <li>
                         <hr style="border: 1px solid green;">
                     </li>
-                {% endif %}
                     <li class="nav-item">
                             {% if user.is_authenticated %}
                             <span class="badge badge-pill badge-primary">{{ user }}</span>
@@ -44,6 +47,9 @@
                         {% else %}
                             <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
                         {% endif %}
+                    </li>
+                <li>
+                        <hr style="border: 1px solid green;">
                     </li>
                 </ul>
             </div>
