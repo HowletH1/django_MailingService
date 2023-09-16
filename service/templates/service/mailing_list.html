@@ -1,4 +1,5 @@
 {% extends 'service/base.html' %}
+{% load group %}
 {% block content %}
     <div class="container">
         <div class="row justify-content-center">
@@ -15,15 +16,20 @@
                     <h5><p class="card-text text-info">{{ mailing.message }}</p></h5>
                        статус активности  <p  class="card-text text-info">{{ mailing.is_active }}</p>
                        статус выполнения  <p class="card-text text-info">{{ mailing.status }}</p>
-{#                    <h5> Клиенты </h5>#}
                     {% for client in mailing.clients.all %}
                         <h6><p class="card-text text-info">{{ client }}</p></h6>
                     {% endfor %}
                     <a href="{% url 'service:mailing_update' mailing.id %}">Редактировать</a>
                     <a href="{% url 'service:mailing_delete' mailing.id %}">Удалить</a><br>
                 </div>
+                {% if user|has_group:"Менеджер" or user.is_staff%}
+                    {% if mailing.is_active %}
+                        <a href="{% url 'service:toggle_mailing' mailing.pk %}" class="btn btn-danger btn-sm">Отключить</a>
+                    {% else %}
+                        <a href="{% url 'service:toggle_mailing' mailing.pk %}" class="btn btn-success btn-sm">Включить</a>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
     {% endfor %}
-
 {% endblock %}

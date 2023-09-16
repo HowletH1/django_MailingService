@@ -8,6 +8,16 @@ from service.services import get_posts_cached
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth import mixins
 from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect
+
+
+class SuCheckMixin:
+    def get_queryset(self):
+        if self.request.user.is_superuser or self.request.user.groups.filter(name='Менеджер').exists():
+            return self.model.objects.all()
+
+        else:
+            return self.model.objects.filter(user=self.request.user)
 
 
 class EditCheckMixin:
@@ -18,16 +28,12 @@ class EditCheckMixin:
         return self.object
 
 
-class SetUserMixin:
+class SetMixin:
     def form_valid(self, form):
         self.object = form.save()
         self.object.user = self.request.user
         self.object.save()
         return super().form_valid(form)
-
-
-class PermissionAndLoginRequiredMixin(PermissionRequiredMixin, LoginRequiredMixin):
-    model = models.Mailing
 
 
 class MainView(generic.TemplateView):
@@ -46,7 +52,7 @@ class MainView(generic.TemplateView):
         return context
 
 
-class ClientCreateView(SetUserMixin, generic.CreateView):
+class ClientCreateView(SetMixin, generic.CreateView):
     # permission_required = 'service.create_client'
     model = Client
     form_class = ClientForm
@@ -56,7 +62,7 @@ class ClientCreateView(SetUserMixin, generic.CreateView):
     }
 
 
-class ClientsView(generic.ListView):
+class ClientsView(SuCheckMixin, generic.ListView):
     model = Client
     extra_context = {
         'title': 'Клиенты для рассылки'
@@ -82,8 +88,8 @@ class ClientUpdateView(EditCheckMixin, generic.UpdateView):
     }
 
 
-class MailingCreateView(PermissionRequiredMixin, SetUserMixin, generic.CreateView):
-    permission_required = 'service.add_mailing'
+class MailingCreateView(SetMixin, generic.CreateView):
+    # permission_required = 'service.add_mailing'
     model = models.Mailing
     form_class = MailingForm
 
@@ -93,14 +99,14 @@ class MailingCreateView(PermissionRequiredMixin, SetUserMixin, generic.CreateVie
     }
 
 
-class MailingsView(generic.ListView):
+class MailingsView(SuCheckMixin, generic.ListView):
     model = models.Mailing
     extra_context = {
         'title': 'Рассылки',
     }
 
 
-class MailingDeleteView(PermissionAndLoginRequiredMixin, EditCheckMixin, generic.DeleteView):
+class MailingDeleteView(EditCheckMixin, generic.DeleteView):
     permission_required = 'service.delete_mailing'
     model = models.Mailing
     success_url = reverse_lazy('service:mailing_list')
@@ -109,7 +115,7 @@ class MailingDeleteView(PermissionAndLoginRequiredMixin, EditCheckMixin, generic
     }
 
 
-class MailingUpdateView(PermissionAndLoginRequiredMixin, EditCheckMixin, generic.UpdateView):
+class MailingUpdateView(EditCheckMixin, generic.UpdateView):
     permission_required = 'service.change_mailing'
     model = models.Mailing
     form_class = MailingForm
@@ -119,15 +125,15 @@ class MailingUpdateView(PermissionAndLoginRequiredMixin, EditCheckMixin, generic
     }
 
 
-class MailingAttemptsView(generic.ListView):
+class MailingAttemptsView(SuCheckMixin, generic.ListView):
     model = MailingLogs
     extra_context = {
         'title': 'Завершенные рассылки'
     }
 
 
-class MessageCreateView(PermissionRequiredMixin, SetUserMixin, generic.CreateView):
-    permission_required = 'service.add_message'
+class MessageCreateView(SetMixin, generic.CreateView):
+    # permission_required = 'service.add_message'
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('service:messages')
@@ -136,15 +142,15 @@ class MessageCreateView(PermissionRequiredMixin, SetUserMixin, generic.CreateVie
     }
 
 
-class MessagesView(generic.ListView):
+class MessagesView(SuCheckMixin, generic.ListView):
     model = Message
     extra_context = {
         'title': 'Сообщения'
     }
 
 
-class MessageDeleteView(PermissionRequiredMixin, EditCheckMixin, generic.DeleteView):
-    permission_required = 'service.delete_mailing'
+class MessageDeleteView(EditCheckMixin, generic.DeleteView):
+    # permission_required = 'service.delete_mailing'
     model = Message
     success_url = reverse_lazy('service:messages')
     extra_context = {
@@ -152,8 +158,8 @@ class MessageDeleteView(PermissionRequiredMixin, EditCheckMixin, generic.DeleteV
     }
 
 
-class MessageUpdateView(PermissionRequiredMixin, EditCheckMixin, generic.UpdateView):
-    permission_required = 'service.change_message'
+class MessageUpdateView(EditCheckMixin, generic.UpdateView):
+    # permission_required = 'service.change_message'
     model = Message
     form_class = MessageForm
     success_url = reverse_lazy('service:messages')
@@ -229,3 +235,35 @@ class BlogPostDeleteView(mixins.PermissionRequiredMixin, generic.DeleteView):
         'title': 'Удаление'
     }
     success_url = reverse_lazy('service:blog')
+
+
+class ToggleAccount(PermissionRequiredMixin, generic.View):
+    permission_required = 'service.block_user'
+
+    def get(self, request, pk):
+        client = get_object_or_404(Client, id=pk)
+
+        if client.is_active:
+            client.is_active = False
+        else:
+            client.is_active = True
+
+        client.save()
+
+        return redirect(reverse('service:clients'))
+
+
+class ToggleMailing(SuCheckMixin, generic.View):
+    def get(self, request, pk):
+        mailing = get_object_or_404(Mailing, id=pk)
+
+        if mailing.is_active:
+            mailing.is_active = False
+            mailing.status = 'CM'
+        else:
+            mailing.is_active = True
+            mailing.status = 'CR'
+
+        mailing.save()
+
+        return redirect(reverse('service:mailing_list'))
