@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-2">
                 <ul class="nav flex-column h5">
-                {% if user|has_group:"Менеджер" or user.is_staff%}
+                {% if user.is_authenticated%}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'service:clients' %}">Клиенты</a>
                     </li>
